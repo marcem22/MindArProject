@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>AR Dinosaurios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" src="/src/main.js"></script>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+
+<body>
+  <!-- Pantalla de inicio mejorada -->
+  <div class="ui-overlay">
+    <div class="intro-animation">
+      <h1 class="title-animated">🦕 Dino AR 🦖</h1>
+      <div class="subtitle">¡Descubre dinosaurios en realidad aumentada!</div>
+      
+      <!-- Preview de dinosaurios -->
+      <div class="dino-preview">
+        <div class="dino-card">🦕 Brachiosaurus</div>
+        <div class="dino-card">🦖 T-Rex</div>
+        <div class="dino-card">🦏 Triceratops</div>
+        <div class="dino-card">🦎 Velociraptor</div>
+      </div>
+      
+      <!-- Instrucciones -->
+      <div class="instructions">
+        <div class="instruction-step">
+          <span class="step-number">1</span>
+          <span>Presiona "Iniciar"</span>
+        </div>
+        <div class="instruction-step">
+          <span class="step-number">2</span>
+          <span>Apunta a los marcadores</span>
+        </div>
+        <div class="instruction-step">
+          <span class="step-number">3</span>
+          <span>¡Disfruta los dinosaurios!</span>
+        </div>
+      </div>
+      
+      <button id="start-button">🚀 Iniciar Aventura</button>
+    </div>
+  </div>
+
+  <!-- Indicadores durante el escaneo -->
+  <div id="scanning-ui" class="hidden">
+    <div class="search-indicator">
+      <div class="scanner-animation"></div>
+      <div class="search-text">🔍 Buscando marcadores...</div>
+      <div class="tip-text">Acerca la cámara a un marcador de dinosaurio</div>
+    </div>
+  </div>
+
+  <!-- Panel de información del dinosaurio -->
+  <div id="dino-info-panel" class="hidden">
+    <div class="info-content">
+      <h3 id="dino-name">Nombre del Dinosaurio</h3>
+      <p id="dino-description">Descripción del dinosaurio...</p>
+      <div class="interaction-buttons">
+        <button id="play-sound-btn">🔊 Rugido</button>
+        <button id="take-photo-btn">📸 Foto</button>
+      </div>
+    </div>
+    <button id="close-info-btn">✕</button>
+  </div>
+
+  <!-- Botón de reinicio mejorado -->
+  <button id="restart-button" class="hidden">🔄 Reiniciar escaneo</button>
+  
+  <!-- Container AR -->
+  <div id="ar-container" class="hidden"></div>
+  
+  <!-- Labels originales (ocultos, los reemplazamos con el panel) -->
+  <div id="labels" style="display: none;">
+    <div class="label" id="label-brachiosaurus">Brachiosaurus</div>
+    <div class="label" id="label-trex">Tyrannosaurus Rex</div>
+    <div class="label" id="label-triceratops">Triceratops</div>
+    <div class="label" id="label-velociraptor">Velociraptor</div>
+  </div>
+
+
+
+  <script>
+    let discoveredDinos = new Set();
+    
+    const dinoInfo = {
+      0: { name: "Brachiosaurus", emoji: "🦕", description: "Gigante herbívoro de cuello largo que vivió hace 150 millones de años." },
+      1: { name: "Tyrannosaurus Rex", emoji: "🦖", description: "El rey de los dinosaurios, depredador feroz de 12 metros de largo." },
+      2: { name: "Triceratops", emoji: "🦏", description: "Herbívoro con tres cuernos y un gran escudo óseo en la cabeza." },
+      3: { name: "Velociraptor", emoji: "🦎", description: "Cazador inteligente y ágil con garras curvas afiladas." }
+    };
+
+    document.querySelector("#start-button").addEventListener("click", () => {
+      document.querySelector(".ui-overlay").style.display = "none";
+      document.querySelector("#ar-container").classList.remove("hidden");
+      document.querySelector("#scanning-ui").classList.remove("hidden");
+      window.start();
+    });
+
+    // Función para actualizar contador de descubrimientos
+    window.updateDiscoveredCount = (dinoIndex) => {
+      if (!discoveredDinos.has(dinoIndex)) {
+        discoveredDinos.add(dinoIndex);
+        
+        const countElement = document.getElementById('discovered-count');
+        const listElement = document.getElementById('discovered-list');
+        
+        countElement.textContent = discoveredDinos.size;
+        
+        // Añadir emoji del dinosaurio descubierto
+        const dinoEmoji = document.createElement('span');
+        dinoEmoji.textContent = dinoInfo[dinoIndex].emoji;
+        dinoEmoji.className = 'discovered-emoji';
+        listElement.appendChild(dinoEmoji);
+        
+
+      }
+    };
+
+    // Función para mostrar info del dinosaurio
+    window.showDinoInfo = (dinoIndex) => {
+      const info = dinoInfo[dinoIndex];
+      const panel = document.getElementById('dino-info-panel');
+      
+      document.getElementById('dino-name').textContent = `${info.emoji} ${info.name}`;
+      document.getElementById('dino-description').textContent = info.description;
+      
+      panel.classList.remove('hidden');
+      document.querySelector("#scanning-ui").classList.add('hidden');
+    };
+
+    // Función para ocultar info del dinosaurio
+    window.hideDinoInfo = () => {
+      document.getElementById('dino-info-panel').classList.add('hidden');
+      document.querySelector("#scanning-ui").classList.remove('hidden');
+    };
+
+    // Event listeners para el panel de información
+    document.getElementById('close-info-btn').addEventListener('click', window.hideDinoInfo);
+    
+    document.getElementById('play-sound-btn').addEventListener('click', () => {
+      // El sonido ya se reproduce automáticamente, pero podemos reproducirlo de nuevo
+      const roarAudio = new Audio('/sounds/roar.mp3');
+      roarAudio.play();
+    });
+
+    document.getElementById('take-photo-btn').addEventListener('click', () => {
+      // Funcionalidad de captura de pantalla (simulada por ahora)
+      alert('📸 ¡Foto capturada!');
+    });
+  </script>
+
+</body>
+
+</html>
